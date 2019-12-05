@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: web-server-5
+  name: web-server-8
 spec:
   volumes:
     - name: html

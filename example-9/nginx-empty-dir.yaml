@@ -1,0 +1,60 @@
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: nginx-config
+data:
+   nginx.conf: |
+    server {
+      listen              80;
+      listen              443 ssl;
+      server_name         localhost;
+      ssl_certificate     certs/https.cert;
+      ssl_certificate_key certs/https.key;
+      ssl_protocols       TLSv1 TLSv1.1 TLSv1.2;
+      ssl_ciphers         HIGH:!aNULL:!MD5;
+
+      location / {
+        root   /usr/share/nginx/html;
+        index  index.html index.htm;
+      }
+    }
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: web-server-9
+spec:
+  volumes:
+    - name: html
+      emptyDir: {}
+#    - name: https
+#      secret: 
+#         secretName: https
+#    - name: config
+#      configMap:
+#         name: nginx-config
+#         items:
+#         - key: nginx.conf
+#           path: https.conf
+  containers:
+    - name: nginx
+      image: nginx
+      ports:
+        - containerPort: 80
+          name: "http-server"
+      volumeMounts:
+        - mountPath: "/usr/share/nginx/html"
+          name: html
+#        - mountPath: "/etc/nginx/certs"
+#          name: https
+#        - name: config
+#          mountPath: /etc/nginx/conf.d
+#          readOnly: true
+    - name: html-generator
+      image: generator:latest
+      imagePullPolicy: Never
+      volumeMounts:
+        - mountPath: "/root/html"
+          name: html
+      
+   
